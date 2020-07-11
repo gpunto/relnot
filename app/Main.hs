@@ -6,7 +6,7 @@ import Options.Applicative
 import System.Directory (createDirectoryIfMissing, getDirectoryContents)
 import System.Process (callProcess, readProcess)
 
-data Mode = Infer | Ticket {name :: String} deriving (Show)
+data Mode = Infer | Ticket {name :: String, message :: String} deriving (Show)
 
 data Opts = Opts {mode :: Mode, directory :: FilePath, addToGit :: Bool} deriving (Show)
 
@@ -37,13 +37,20 @@ inferParser =
       <> help "Try to infer ticket and message"
 
 ticketParser :: Parser Mode
-ticketParser = Ticket <$> nameParser
+ticketParser = Ticket <$> nameParser <*> messageParser
 
 nameParser :: Parser String
 nameParser =
   strArgument $
-    metavar "NAME"
+    metavar "TICKET"
       <> help "ticket name"
+
+messageParser :: Parser String
+messageParser =
+  strArgument $
+    metavar "MESSAGE"
+      <> value ""
+      <> help "Release notes message"
 
 defaultPath :: FilePath
 defaultPath = "./release_notes"
@@ -55,7 +62,7 @@ pathParser =
       <> long "dir"
       <> short 'd'
       <> metavar "DIRECTORY"
-      <> help "path to directory"
+      <> help "Path to directory"
 
 gitAddParser :: Parser Bool
 gitAddParser =
@@ -70,7 +77,7 @@ optsToFileData (Opts mode dir gitAdd) = case mode of
     fdata <$> latestCommitMessage
     where
       fdata s = buildFileData dir <$> extractTicketMessage s
-  (Ticket ticket) -> return . Right $ buildFileData dir (ticket, "")
+  (Ticket ticket message) -> return . Right $ buildFileData dir (ticket, message)
 
 buildFileData :: FilePath -> (String, String) -> FileData
 buildFileData dir (ticket, message) = FileData dir p c
