@@ -37,6 +37,8 @@ executables:
       - -threaded
       - -rtsopts
       - -with-rtsopts=-N
+    dependencies:
+      - relnot
 
 tests:
   relnot-test:
