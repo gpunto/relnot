@@ -7,15 +7,27 @@ where
 
 import Options.Applicative
 
-data Mode = Infer | Ticket {name :: String, message :: String} deriving (Show)
+data Mode
+  = Infer
+  | Ticket
+      { name :: String,
+        message :: String
+      }
+  deriving (Show)
 
-data Opts = Opts {mode :: Mode, directory :: FilePath, addToGit :: Bool} deriving (Show)
+data Opts = Opts
+  { mode :: Mode,
+    directory :: FilePath,
+    overwrite :: Bool,
+    addToGit :: Bool
+  }
+  deriving (Show)
 
 parseOpts :: IO Opts
 parseOpts = execParser (info optsParser (progDesc "Create release notes file"))
 
 optsParser :: Parser Opts
-optsParser = Opts <$> modeParser <*> pathParser <*> gitAddParser
+optsParser = Opts <$> modeParser <*> pathParser <*> overwriteParser <*> gitAddParser
 
 modeParser :: Parser Mode
 modeParser = inferParser <|> ticketParser
@@ -61,3 +73,10 @@ gitAddParser =
     long "git-add"
       <> short 'g'
       <> help "Whether to run git add on the generated file"
+
+overwriteParser :: Parser Bool
+overwriteParser =
+  switch $
+    long "overwrite"
+      <> short 'o'
+      <> help "Whether the generate file can overwrite an existing one"

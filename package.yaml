@@ -25,6 +25,7 @@ dependencies:
   - optparse-applicative
   - system-filepath
   - process
+  - cond
 
 library:
   source-dirs: src

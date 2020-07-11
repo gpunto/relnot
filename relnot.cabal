@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0cad0592db14f57c844ff05c2c43d670b769753de5f74809cd97464f661de255
+-- hash: 08f24b5847f5d9d3501a793cd77cb8b8f870f73247ffda2038451e2dee650ec4
 
 name:           relnot
 version:        0.1.0.0
@@ -35,6 +35,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , cond
     , directory
     , optparse-applicative
     , process
@@ -50,6 +51,7 @@ executable relnot
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , cond
     , directory
     , optparse-applicative
     , process
@@ -67,6 +69,7 @@ test-suite relnot-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , cond
     , directory
     , optparse-applicative
     , process
