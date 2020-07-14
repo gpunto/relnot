@@ -9,6 +9,8 @@ import Options.Applicative
 
 data Mode
   = Infer
+      { branch :: Bool
+      }
   | Ticket
       { name :: String,
         message :: String
@@ -24,7 +26,7 @@ data Opts = Opts
   deriving (Show)
 
 parseOpts :: IO Opts
-parseOpts = execParser (info optsParser (progDesc "Create release notes file"))
+parseOpts = execParser (info (optsParser <**> helper) (progDesc "Create release notes file"))
 
 optsParser :: Parser Opts
 optsParser = Opts <$> modeParser <*> pathParser <*> overwriteParser <*> gitAddParser
@@ -34,13 +36,25 @@ modeParser = inferParser <|> ticketParser
 
 inferParser :: Parser Mode
 inferParser =
-  flag' Infer $
-    long "infer"
-      <> short 'i'
-      <> help "Try to infer ticket and message"
+  Infer
+    <$> ( flag'
+            ()
+            ( long "infer"
+                <> short 'i'
+                <> help "Try to infer ticket and message"
+            )
+            *> branchParser
+        )
 
 ticketParser :: Parser Mode
 ticketParser = Ticket <$> nameParser <*> messageParser
+
+branchParser :: Parser Bool
+branchParser =
+  switch $
+    long "branch"
+      <> short 'b'
+      <> help "Whether to use the branch name for inferring"
 
 nameParser :: Parser String
 nameParser =
@@ -79,4 +93,4 @@ overwriteParser =
   switch $
     long "overwrite"
       <> short 'o'
-      <> help "Whether the generate file can overwrite an existing one"
+      <> help "Whether the generated file can overwrite an existing one"

@@ -27,5 +27,5 @@ main = do
 
 toFileData :: Mode -> String -> IO (Either String FileData)
 toFileData mode dir = case mode of
-  Infer -> inferred dir
-  (Ticket ticket message) -> return . Right $ explicit dir ticket message
+  Infer branch -> inferred branch dir
+  Ticket ticket message -> return . Right $ explicit dir ticket message

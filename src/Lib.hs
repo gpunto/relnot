@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module Lib
   ( FileData (..),
     inferred,
@@ -10,11 +12,20 @@ import Git
 
 data FileData = FileData {dir :: FilePath, path :: FilePath, content :: String}
 
-inferred :: String -> IO (Either String FileData)
-inferred dir =
+inferred :: Bool -> String -> IO (Either String FileData)
+inferred useBranch = if useBranch then branchInfer else commitInfer
+
+commitInfer :: String -> IO (Either String FileData)
+commitInfer dir =
   fdata <$> latestCommitMessage
   where
-    fdata s = buildFileData dir <$> extractTicketMessage s
+    fdata s = buildFileData dir <$> commitExtractTicketMessage s
+
+branchInfer :: String -> IO (Either String FileData)
+branchInfer dir =
+  fdata <$> branchName
+  where
+    fdata s = buildFileData dir . (, "") <$> branchExtractTicket s
 
 explicit :: FilePath -> String -> String -> FileData
 explicit dir ticket message = buildFileData dir (ticket, message)
@@ -40,8 +51,8 @@ capHack :: String -> String
 capHack "CAP" = "CaP"
 capHack s = s
 
-extractTicketMessage :: String -> Either String (String, String)
-extractTicketMessage ('[' : cs) = case split ']' cs of
+commitExtractTicketMessage :: String -> Either String (String, String)
+commitExtractTicketMessage ('[' : cs) = case split ']' cs of
   (_, "") ->
     Left $
       "Couldn't parse the commit, did you forget a bracket or the message?\n"
@@ -49,5 +60,14 @@ extractTicketMessage ('[' : cs) = case split ']' cs of
         ++ cs
   (ticket, ' ' : message) -> Right (ticket, message)
   pair -> Right pair
-extractTicketMessage commit =
+commitExtractTicketMessage commit =
   Left $ "Couldn't parse the commit, did you forget the ticket?\nCommit message: " ++ commit
+
+branchExtractTicket :: String -> Either String String
+branchExtractTicket name = case split '/' name of
+  (name, "") -> Left "Couldn't parse the branch name, is it in the \"[type/]ticket/name\" format?"
+  ("feat", rest) -> branchExtractTicket rest
+  ("feature", rest) -> branchExtractTicket rest
+  ("fix", rest) -> branchExtractTicket rest
+  ("tech", rest) -> branchExtractTicket rest
+  (ticket, _) -> Right ticket
