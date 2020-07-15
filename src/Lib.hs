@@ -25,7 +25,7 @@ branchInfer :: String -> IO (Either String FileData)
 branchInfer dir =
   fdata <$> branchName
   where
-    fdata s = buildFileData dir . (, "") <$> branchExtractTicket s
+    fdata s = buildFileData dir . (,"") <$> branchExtractTicket s
 
 explicit :: FilePath -> String -> String -> FileData
 explicit dir ticket message = buildFileData dir (ticket, message)
@@ -33,7 +33,7 @@ explicit dir ticket message = buildFileData dir (ticket, message)
 buildFileData :: FilePath -> (String, String) -> FileData
 buildFileData dir (ticket, message) = FileData dir p c
   where
-    p = dir ++ "/" ++ ticket
+    p = dir ++ "/" ++ ticket ++ ".md"
     upper = map toUpper ticket
     (team, number) = split '-' upper
     c = "[" ++ capHack team ++ "] " ++ message ++ " (" ++ upper ++ ")\n"
