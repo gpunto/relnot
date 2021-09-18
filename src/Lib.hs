@@ -36,7 +36,7 @@ buildFileData dir (ticket, message) = FileData dir p c
     p = dir ++ "/" ++ ticket ++ ".md"
     upper = map toUpper ticket
     (team, number) = split '-' upper
-    c = "[" ++ capHack team ++ "] " ++ message ++ " (" ++ upper ++ ")\n"
+    c = "[" ++ team ++ "] " ++ message ++ " (" ++ upper ++ ")\n"
 
 split :: Eq a => a -> [a] -> ([a], [a])
 split c = go []
@@ -46,10 +46,6 @@ split c = go []
       if h == c
         then (reverse acc, hs)
         else go (h : acc) hs
-
-capHack :: String -> String
-capHack "CAP" = "CaP"
-capHack s = s
 
 commitExtractTicketMessage :: String -> Either String (String, String)
 commitExtractTicketMessage ('[' : cs) = case split ']' cs of
