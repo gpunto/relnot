@@ -2,15 +2,25 @@
 
 module Lib
   ( FileData (..),
+    FileName,
     inferred,
     explicit,
+    buildFilePath,
+    findFreeName,
   )
 where
 
 import Data.Char (toUpper)
+import Data.Functor ((<&>))
+import Data.List (stripPrefix)
+import Data.Maybe (fromMaybe)
 import Git
+import System.FilePath (stripExtension, (</>))
+import Text.Read (readMaybe)
 
-data FileData = FileData {dir :: FilePath, path :: FilePath, content :: String}
+data FileData = FileData {directory :: FilePath, fileName :: FileName, content :: String}
+
+newtype FileName = FileName String
 
 inferred :: Bool -> String -> IO (Either String FileData)
 inferred useBranch = if useBranch then branchInfer else commitInfer
@@ -31,11 +41,11 @@ explicit :: FilePath -> String -> String -> FileData
 explicit dir ticket message = buildFileData dir (ticket, message)
 
 buildFileData :: FilePath -> (String, String) -> FileData
-buildFileData dir (ticket, message) = FileData dir p c
+buildFileData dir (ticket, message) = FileData dir name c
   where
-    p = dir ++ "/" ++ ticket ++ ".md"
+    name = FileName ticket
     upper = map toUpper ticket
-    (team, number) = split '-' upper
+    (team, _) = split '-' upper
     c = "[" ++ team ++ "] " ++ message ++ " (" ++ upper ++ ")\n"
 
 split :: Eq a => a -> [a] -> ([a], [a])
@@ -61,9 +71,29 @@ commitExtractTicketMessage commit =
 
 branchExtractTicket :: String -> Either String String
 branchExtractTicket name = case split '/' name of
-  (name, "") -> Left "Couldn't parse the branch name, is it in the \"[type/]ticket/name\" format?"
+  (_, "") -> Left "Couldn't parse the branch name, is it in the \"[type/]ticket/name\" format?"
   ("feat", rest) -> branchExtractTicket rest
   ("feature", rest) -> branchExtractTicket rest
   ("fix", rest) -> branchExtractTicket rest
   ("tech", rest) -> branchExtractTicket rest
   (ticket, _) -> Right ticket
+
+extension :: String
+extension = ".md"
+
+findFreeName :: FileName -> [FilePath] -> FileName
+findFreeName (FileName desiredName) =
+  map extractCopyNum
+    <&> maximum
+    <&> (\n -> desiredName ++ "-" ++ show (n + 1))
+    <&> FileName
+  where
+    extractCopyNum :: FilePath -> Int
+    extractCopyNum name =
+      fromMaybe 0 $
+        stripExtension extension name
+          >>= stripPrefix (desiredName ++ "-")
+          >>= readMaybe
+
+buildFilePath :: FilePath -> FileName -> FilePath
+buildFilePath dir (FileName name) = dir </> name ++ extension

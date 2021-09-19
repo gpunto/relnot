@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 08f24b5847f5d9d3501a793cd77cb8b8f870f73247ffda2038451e2dee650ec4
+-- hash: ca2ad4e57b6da5fb6a5ec76e1ca8b4e3eb1e6cfb7c24f7c55c0bd0c212cad1a0
 
 name:           relnot
 version:        0.1.0.0
@@ -37,9 +37,9 @@ library
       base >=4.7 && <5
     , cond
     , directory
+    , filepath
     , optparse-applicative
     , process
-    , system-filepath
   default-language: Haskell2010
 
 executable relnot
@@ -53,10 +53,10 @@ executable relnot
       base >=4.7 && <5
     , cond
     , directory
+    , filepath
     , optparse-applicative
     , process
     , relnot
-    , system-filepath
   default-language: Haskell2010
 
 test-suite relnot-test
@@ -71,8 +71,8 @@ test-suite relnot-test
       base >=4.7 && <5
     , cond
     , directory
+    , filepath
     , optparse-applicative
     , process
     , relnot
-    , system-filepath
   default-language: Haskell2010

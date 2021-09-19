@@ -23,7 +23,7 @@ dependencies:
   - base >= 4.7 && < 5
   - directory
   - optparse-applicative
-  - system-filepath
+  - filepath
   - process
   - cond
 

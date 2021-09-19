@@ -1,7 +1,8 @@
 module Options
   ( parseOpts,
-    Opts (..),
+    Opts (Opts),
     Mode (..),
+    OnConflict (..),
   )
 where
 
@@ -12,15 +13,21 @@ data Mode
       { branch :: Bool
       }
   | Ticket
-      { name :: String,
+      { originalName :: String,
         message :: String
       }
+  deriving (Show)
+
+data OnConflict
+  = Abort
+  | Overwrite
+  | CreateNew
   deriving (Show)
 
 data Opts = Opts
   { mode :: Mode,
     directory :: FilePath,
-    overwrite :: Bool,
+    onConflict :: OnConflict,
     addToGit :: Bool
   }
   deriving (Show)
@@ -29,7 +36,7 @@ parseOpts :: IO Opts
 parseOpts = execParser (info (optsParser <**> helper) (progDesc "Create release notes file"))
 
 optsParser :: Parser Opts
-optsParser = Opts <$> modeParser <*> pathParser <*> overwriteParser <*> gitAddParser
+optsParser = Opts <$> modeParser <*> pathParser <*> onConflictParser <*> gitAddParser
 
 modeParser :: Parser Mode
 modeParser = inferParser <|> ticketParser
@@ -88,9 +95,19 @@ gitAddParser =
       <> short 'g'
       <> help "Whether to run git add on the generated file"
 
-overwriteParser :: Parser Bool
+onConflictParser :: Parser OnConflict
+onConflictParser = overwriteParser <|> createNewParser <|> pure Abort
+
+overwriteParser :: Parser OnConflict
 overwriteParser =
-  switch $
+  flag' Overwrite $
     long "overwrite"
       <> short 'o'
-      <> help "Whether the generated file can overwrite an existing one"
+      <> help "Whether the generated file should overwrite the existing one in case of conflict"
+
+createNewParser :: Parser OnConflict
+createNewParser =
+  flag' CreateNew $
+    long "create-new"
+      <> short 'n'
+      <> help "Whether the generated file should be created alongside the existing one in case of conflict"
