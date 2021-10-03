@@ -4,15 +4,15 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ca2ad4e57b6da5fb6a5ec76e1ca8b4e3eb1e6cfb7c24f7c55c0bd0c212cad1a0
+-- hash: 7e6b8752b2c5de31f0723494091adcc15f029d17fd4dec386d77ec878d5a3c89
 
 name:           relnot
-version:        0.1.0.0
+version:        0.4.0.0
 description:    Please see the README on GitHub at <https://github.com/gpunto/relnot>
 homepage:       https://github.com/gpunto/relnot#readme
 bug-reports:    https://github.com/gpunto/relnot/issues
 author:         Gianmarco David
-copyright:      2019 Gianmarco David
+copyright:      2021 Gianmarco David
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
