@@ -8,10 +8,10 @@ A small program to generate release notes files in the format:
 ## Usage
 
 ```
-Usage: relnot ((-i|--infer) [-b|--branch] | TICKET [MESSAGE]) 
-    [-d|--dir DIRECTORY]
-    [-o|--overwrite]
-    [-g|--git-add]
+relnot ((-i|--infer) [-b|--branch] | TICKET [MESSAGE]) 
+       [-d|--dir DIRECTORY]
+       [(-o|--overwrite) | (-n|--create-new)] 
+       [-g|--git-add]
 ```
 
 - `TICKET`: the ticket number, e.g. CAP-1234, CX-1010
@@ -22,8 +22,9 @@ It expects a commit message in the format: `[TICKET] MESSAGE`, e.g. `[CAP-1234] 
 It expects a branch name in the format `type/ticket/name` or `ticket/name`.
 Only valid when used with `-i|--infer`
 - `-d|--dir DIRECTORY`: the directory where to put the release notes file  
-Defaults to: `./release_notes` 
-- `-o|--overwrite`: force overwrite the target file if it already exists 
+Defaults to: `./release_notes`
+- `-o|--overwrite`: when the target file exists: force overwrite
+- `-n|--create-new`: when the target file exists: create a new one alongside
 - `-g|--git-add`: run `git add` on the generated file
 
 ## Examples
